@@ -28,9 +28,14 @@ reg add HKEY_CLASSES_ROOT\PlayniteFullscreen /v "URL Protocol" /t  REG_SZ  /d  "
 reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\DefaultIcon /t  REG_SZ  /d  "\"%playnitePath%\""  /f >nul
 reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\shell\open\command /t  REG_SZ  /d "\"%playnitePath%\" %param1% %param2%" /f >nul
 
+:: Prefer .NET Native output when this script is run from the parent Release folder.
+:: The parent folder contains an app manifest, but the runnable loose app is in ilc.
+set appManifest=%~dp0AppxManifest.xml
+if exist "%~dp0ilc\AppxManifest.xml" set appManifest=%~dp0ilc\AppxManifest.xml
+
 :: Register App
 echo Registering UWP App...
-powershell add-apppackage -register %~dp0appxmanifest.xml
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Add-AppxPackage -Register '%appManifest%'"
 
 :: Installation Completed
 echo. & echo Installation Completed Successfully! & echo.

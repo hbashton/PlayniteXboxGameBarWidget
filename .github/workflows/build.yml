@@ -64,11 +64,18 @@ jobs:
           /p:WindowsWinmdPath="$env:WindowsWinmdPath"
           /p:TargetPlatformVersion="$env:TargetPlatformVersion"
 
+      - name: Prepare loose install artifact
+        shell: pwsh
+        run: |
+          $output = "artifacts\PlayniteXboxWidgetLoose"
+          New-Item -ItemType Directory -Force $output | Out-Null
+          Copy-Item "PlayniteXboxGameBarWidget\bin\x64\Release\ilc\*" $output -Recurse -Force
+
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
         with:
           name: PlayniteXboxGameBarWidget
           path: |
             PlayniteXboxGameBarWidget/AppPackages/**
-            PlayniteXboxGameBarWidget/bin/x64/Release/**
+            artifacts/PlayniteXboxWidgetLoose/**
           if-no-files-found: warn
