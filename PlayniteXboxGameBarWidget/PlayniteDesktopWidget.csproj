@@ -232,7 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Windows">
-      <HintPath>$(UniversalCRTSdkDir)UnionMetadata\$(TargetPlatformVersion)\Windows.winmd</HintPath>
+      <HintPath>$(WindowsSdkDir)UnionMetadata\$(TargetPlatformVersion)\Windows.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
       <Private>false</Private>
     </Reference>
