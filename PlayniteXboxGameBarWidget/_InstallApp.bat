@@ -25,8 +25,8 @@ if /I "%c%" equ "Y"  set param2=--hidesplashscreen
 cls & echo Updating Registry...
 reg add HKEY_CLASSES_ROOT\PlayniteFullscreen /t REG_SZ  /d  "URL:PlayniteFullscreen" /f >nul
 reg add HKEY_CLASSES_ROOT\PlayniteFullscreen /v "URL Protocol" /t  REG_SZ  /d  "" /f >nul
-reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\DefaultIcon /t  REG_SZ  /d  %playnitePath%  /f >nul
-reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\shell\open\command /t  REG_SZ  /d "%playnitePath% %param1% %param2%" /f >nul
+reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\DefaultIcon /t  REG_SZ  /d  "\"%playnitePath%\""  /f >nul
+reg add HKEY_CLASSES_ROOT\PlayniteFullscreen\shell\open\command /t  REG_SZ  /d "\"%playnitePath%\" %param1% %param2%" /f >nul
 
 :: Register App
 echo Registering UWP App...

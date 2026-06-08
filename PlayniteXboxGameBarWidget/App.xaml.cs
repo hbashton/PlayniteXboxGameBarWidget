@@ -6,6 +6,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Windows.ApplicationModel.Activation;
+    using Windows.Storage;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
 
@@ -43,18 +44,22 @@
         /// <param name="args">The args<see cref="IActivatedEventArgs"/>.</param>
         protected override void OnActivated(IActivatedEventArgs args)
         {
+            LogAsync($"Activated: kind={args.Kind}").ConfigureAwait(false);
             XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
             if (args.Kind == ActivationKind.Protocol)
             {
                 var protocolArgs = args as IProtocolActivatedEventArgs;
                 string scheme = protocolArgs.Uri.Scheme;
+                LogAsync($"Protocol activation: scheme={scheme}, uri={protocolArgs.Uri}").ConfigureAwait(false);
                 if (scheme.Equals("ms-gamebarwidget"))
                 {
                     widgetArgs = args as XboxGameBarWidgetActivatedEventArgs;
+                    LogAsync($"Game Bar args cast: {widgetArgs != null}").ConfigureAwait(false);
                 }
             }
             if (widgetArgs != null)
             {
+                LogAsync($"Game Bar activation: isLaunch={widgetArgs.IsLaunchActivation}").ConfigureAwait(false);
                 if (widgetArgs.IsLaunchActivation)
                 {
                     Frame rootFrame = new Frame();
@@ -68,6 +73,8 @@
                     playniteWidget.WindowStateChanged += Widget1_WindowStateChanged;
                 }
             }
+
+            Window.Current.Activate();
 
             // Open Playnite straight away
             OpenPlaynite();
@@ -111,12 +118,41 @@
         private async void OpenPlaynite()
         {
             Uri uri = new Uri(uriToLaunch);
-            await Windows.System.Launcher.LaunchUriAsync(uri); // Call once to start the app
+            bool firstLaunch = await Windows.System.Launcher.LaunchUriAsync(uri); // Call once to start the app
+            await LogAsync($"First LaunchUriAsync({uri}) result: {firstLaunch}");
 
             // Call again to bring to focus
-            Thread.Sleep(1000);
-            await Windows.System.Launcher.LaunchUriAsync(uri);
+            await Task.Delay(1000);
+            bool secondLaunch = await Windows.System.Launcher.LaunchUriAsync(uri);
+            await LogAsync($"Second LaunchUriAsync({uri}) result: {secondLaunch}");
             appLaunched = true;
+
+            await Task.Delay(500);
+            if (playniteWidget != null)
+            {
+                playniteWidget.Close();
+            }
+        }
+
+        /// <summary>
+        /// Writes simple diagnostics to the package LocalState folder.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
+        private static async Task LogAsync(string message)
+        {
+            try
+            {
+                StorageFile logFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(
+                    "PlayniteXboxWidget.log",
+                    CreationCollisionOption.OpenIfExists);
+                await FileIO.AppendTextAsync(
+                    logFile,
+                    $"{DateTimeOffset.Now:O} {message}{Environment.NewLine}");
+            }
+            catch
+            {
+                Debug.WriteLine(message);
+            }
         }
     }
 }
