@@ -237,6 +237,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <SDKReference Include="WindowsDesktop, Version=$(TargetPlatformVersion)" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="_InstallApp.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
