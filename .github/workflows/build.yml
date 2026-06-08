@@ -36,10 +36,13 @@ jobs:
         shell: pwsh
         run: |
           $winmd = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\UnionMetadata" -Filter Windows.winmd -Recurse |
+            Where-Object { $_.FullName -notmatch '\\Facade\\' } |
             Sort-Object FullName -Descending |
             Select-Object -First 1
           if (-not $winmd) {
-            throw "Windows.winmd was not found under the Windows Kits UnionMetadata folder."
+            Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\UnionMetadata" -Filter Windows.winmd -Recurse |
+              Select-Object FullName
+            throw "A versioned Windows.winmd was not found under the Windows Kits UnionMetadata folder. Facade metadata is not enough for this UWP build."
           }
           "WindowsWinmdPath=$($winmd.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
           $winmd.FullName
