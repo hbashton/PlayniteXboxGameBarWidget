@@ -27,6 +27,7 @@ jobs:
             --installPath $installPath `
             --add Microsoft.VisualStudio.Workload.Universal `
             --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
+            --add Microsoft.VisualStudio.Component.Windows11SDK.26100 `
             --includeRecommended `
             --quiet `
             --norestart
@@ -34,10 +35,17 @@ jobs:
       - name: Locate Windows metadata
         shell: pwsh
         run: |
-          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\UnionMetadata" -Filter Windows.winmd -Recurse |
-            Select-Object FullName
+          $winmd = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\UnionMetadata" -Filter Windows.winmd -Recurse |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1
+          if (-not $winmd) {
+            throw "Windows.winmd was not found under the Windows Kits UnionMetadata folder."
+          }
+          "WindowsWinmdPath=$($winmd.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          $winmd.FullName
 
       - name: Restore and build package
+        shell: pwsh
         run: >
           msbuild PlayniteXboxGameBarWidget.sln
           /restore
@@ -47,6 +55,7 @@ jobs:
           /p:AppxBundlePlatforms=x64
           /p:UapAppxPackageBuildMode=SideLoadOnly
           /p:AppxPackageSigningEnabled=false
+          /p:WindowsWinmdPath="$env:WindowsWinmdPath"
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4

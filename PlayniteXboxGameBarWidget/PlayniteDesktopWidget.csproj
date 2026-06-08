@@ -5,6 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(MSBuildProgramFiles32)\Windows Kits\10\</WindowsSdkDir>
+    <WindowsWinmdPath Condition="'$(WindowsWinmdPath)' == ''">$(WindowsSdkDir)UnionMetadata\$(TargetPlatformVersion)\Windows.winmd</WindowsWinmdPath>
     <ProjectGuid>{94D05A38-04B0-4EA4-AD28-4ADFE4719E84}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -233,7 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Windows">
-      <HintPath>$(WindowsSdkDir)UnionMetadata\$(TargetPlatformVersion)\Windows.winmd</HintPath>
+      <HintPath>$(WindowsWinmdPath)</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
       <Private>false</Private>
     </Reference>
