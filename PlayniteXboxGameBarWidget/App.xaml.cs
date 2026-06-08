@@ -35,7 +35,15 @@
         /// </summary>
         public App()
         {
-            this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// The application entry point.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
+        public static void Main(string[] args)
+        {
+            Application.Start(_ => new App());
         }
 
         /// <summary>
