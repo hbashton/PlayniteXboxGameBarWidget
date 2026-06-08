@@ -31,6 +31,12 @@ jobs:
             --quiet `
             --norestart
 
+      - name: Locate Windows metadata
+        shell: pwsh
+        run: |
+          Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\UnionMetadata" -Filter Windows.winmd -Recurse |
+            Select-Object FullName
+
       - name: Restore and build package
         run: >
           msbuild PlayniteXboxGameBarWidget.sln

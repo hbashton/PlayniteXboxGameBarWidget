@@ -4,6 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(MSBuildProgramFiles32)\Windows Kits\10\</WindowsSdkDir>
     <ProjectGuid>{94D05A38-04B0-4EA4-AD28-4ADFE4719E84}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
