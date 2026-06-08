@@ -44,8 +44,11 @@ jobs:
               Select-Object FullName
             throw "A versioned Windows.winmd was not found under the Windows Kits UnionMetadata folder. Facade metadata is not enough for this UWP build."
           }
+          $sdkVersion = $winmd.Directory.Name
           "WindowsWinmdPath=$($winmd.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "TargetPlatformVersion=$sdkVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
           $winmd.FullName
+          $sdkVersion
 
       - name: Restore and build package
         shell: pwsh
@@ -59,6 +62,7 @@ jobs:
           /p:UapAppxPackageBuildMode=SideLoadOnly
           /p:AppxPackageSigningEnabled=false
           /p:WindowsWinmdPath="$env:WindowsWinmdPath"
+          /p:TargetPlatformVersion="$env:TargetPlatformVersion"
 
       - name: Upload package artifacts
         uses: actions/upload-artifact@v4
