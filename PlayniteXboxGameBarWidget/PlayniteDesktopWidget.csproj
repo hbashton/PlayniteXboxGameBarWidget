@@ -240,6 +240,9 @@
     <Content Include="_InstallApp.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="FullTrust\PlayniteLauncher.exe" Condition="Exists('FullTrust\PlayniteLauncher.exe')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <XboxGameBar-Platform Condition="'$(Platform)' == 'x86'">win32</XboxGameBar-Platform>

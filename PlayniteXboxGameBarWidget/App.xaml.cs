@@ -3,8 +3,8 @@
     using Microsoft.Gaming.XboxGameBar;
     using System;
     using System.Diagnostics;
-    using System.Threading;
     using System.Threading.Tasks;
+    using Windows.ApplicationModel;
     using Windows.ApplicationModel.Activation;
     using Windows.Storage;
     using Windows.UI.Xaml;
@@ -50,24 +50,31 @@
         /// The OnActivated.
         /// </summary>
         /// <param name="args">The args<see cref="IActivatedEventArgs"/>.</param>
-        protected override void OnActivated(IActivatedEventArgs args)
+        protected override async void OnActivated(IActivatedEventArgs args)
         {
-            LogAsync($"Activated: kind={args.Kind}").ConfigureAwait(false);
+            await LogAsync($"Activated: kind={args.Kind}");
             XboxGameBarWidgetActivatedEventArgs widgetArgs = null;
             if (args.Kind == ActivationKind.Protocol)
             {
                 var protocolArgs = args as IProtocolActivatedEventArgs;
-                string scheme = protocolArgs.Uri.Scheme;
-                LogAsync($"Protocol activation: scheme={scheme}, uri={protocolArgs.Uri}").ConfigureAwait(false);
-                if (scheme.Equals("ms-gamebarwidget"))
+                if (protocolArgs != null)
                 {
-                    widgetArgs = args as XboxGameBarWidgetActivatedEventArgs;
-                    LogAsync($"Game Bar args cast: {widgetArgs != null}").ConfigureAwait(false);
+                    string scheme = protocolArgs.Uri.Scheme;
+                    await LogAsync($"Protocol activation: scheme={scheme}, uri={protocolArgs.Uri}");
+                    if (scheme.Equals("ms-gamebarwidget"))
+                    {
+                        widgetArgs = args as XboxGameBarWidgetActivatedEventArgs;
+                        await LogAsync($"Game Bar args cast: {widgetArgs != null}");
+                    }
+                }
+                else
+                {
+                    await LogAsync("Protocol activation args were not available");
                 }
             }
             if (widgetArgs != null)
             {
-                LogAsync($"Game Bar activation: isLaunch={widgetArgs.IsLaunchActivation}").ConfigureAwait(false);
+                await LogAsync($"Game Bar activation: isLaunch={widgetArgs.IsLaunchActivation}");
                 if (widgetArgs.IsLaunchActivation)
                 {
                     Frame rootFrame = new Frame();
@@ -133,6 +140,20 @@
             await Task.Delay(1000);
             bool secondLaunch = await Windows.System.Launcher.LaunchUriAsync(uri);
             await LogAsync($"Second LaunchUriAsync({uri}) result: {secondLaunch}");
+
+            if (!firstLaunch && !secondLaunch)
+            {
+                try
+                {
+                    await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
+                    await LogAsync("FullTrustProcessLauncher result: launched");
+                }
+                catch (Exception ex)
+                {
+                    await LogAsync($"FullTrustProcessLauncher exception: {ex.GetType().FullName}: {ex.Message}");
+                }
+            }
+
             appLaunched = true;
 
             await Task.Delay(500);

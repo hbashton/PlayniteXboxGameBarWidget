@@ -28,6 +28,8 @@ jobs:
             --add Microsoft.VisualStudio.Workload.Universal `
             --add Microsoft.VisualStudio.Component.Windows10SDK.19041 `
             --add Microsoft.VisualStudio.Component.Windows11SDK.26100 `
+            --add Microsoft.Net.Component.4.8.SDK `
+            --add Microsoft.Net.Component.4.8.TargetingPack `
             --includeRecommended `
             --quiet `
             --norestart
@@ -49,6 +51,13 @@ jobs:
           "TargetPlatformVersion=$sdkVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
           $winmd.FullName
           $sdkVersion
+
+      - name: Build full trust launcher
+        shell: pwsh
+        run: |
+          msbuild PlayniteLauncher\PlayniteLauncher.csproj /restore /p:Configuration=Release /p:Platform=AnyCPU
+          New-Item -ItemType Directory -Force PlayniteXboxGameBarWidget\FullTrust | Out-Null
+          Copy-Item PlayniteLauncher\bin\Release\PlayniteLauncher.exe PlayniteXboxGameBarWidget\FullTrust\PlayniteLauncher.exe -Force
 
       - name: Restore and build package
         shell: pwsh
